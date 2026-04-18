@@ -23,4 +23,542 @@
     --bg: #050510;
     --panel: #0a0a1f;
     --neon: #ffffff;
-    --w: 70
+    --w: 700px;
+    --h: 420px;
+  }
+
+  body {
+    background: var(--bg);
+    color: white;
+    font-family: 'Press Start 2P', monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100svh;
+    padding: 16px 10px;
+    overflow-x: hidden;
+  }
+
+  h1 {
+    font-size: clamp(14px, 4vw, 22px);
+    letter-spacing: 0.4em;
+    color: var(--neon);
+    text-shadow: 0 0 20px #fff, 0 0 40px #aaa;
+    margin-bottom: 14px;
+  }
+
+  /* ── MARCADOR ── */
+  #marcador {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 12px;
+    font-size: clamp(18px, 5vw, 32px);
+  }
+  #marcador .label { font-size: 0.4em; letter-spacing: 0.15em; opacity: 0.7; display: block; margin-bottom: 4px; }
+  #marcador .pts-azul { color: var(--azul); text-shadow: 0 0 16px var(--azul); }
+  #marcador .pts-rojo { color: var(--rojo); text-shadow: 0 0 16px var(--rojo); }
+  #marcador .sep { color: #444; font-size: 1em; }
+
+  /* ── CONTROLES ROJO (arriba) ── */
+  #ctrl-rojo {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 10px;
+    width: min(var(--w), 96vw);
+    justify-content: flex-end;
+  }
+
+  /* ── CANCHA ── */
+  #cancha {
+    position: relative;
+    width: min(var(--w), 96vw);
+    height: var(--h);
+    background: var(--panel);
+    border: 2px solid #1a1a3e;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 0 40px #000a, inset 0 0 60px #00000080;
+  }
+
+  /* línea central punteada */
+  #cancha::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0; bottom: 0;
+    width: 3px;
+    transform: translateX(-50%);
+    background: repeating-linear-gradient(
+      to bottom,
+      #ffffff18 0px, #ffffff18 14px,
+      transparent 14px, transparent 28px
+    );
+  }
+
+  /* scanlines */
+  #cancha::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px, transparent 3px,
+      rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* ── PALETAS ── */
+  .paleta {
+    position: absolute;
+    width: 12px;
+    height: 80px;
+    border-radius: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  #azul {
+    left: 16px;
+    background: var(--azul);
+    box-shadow: 0 0 18px var(--azul), 0 0 40px #00e5ff66;
+  }
+  #rojo {
+    right: 16px;
+    background: var(--rojo);
+    box-shadow: 0 0 18px var(--rojo), 0 0 40px #ff174466;
+  }
+
+  /* ── PELOTA ── */
+  #pelota {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: white;
+    border-radius: 50%;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 14px #fff, 0 0 30px #ffffff88;
+    z-index: 5;
+  }
+
+  /* ── CONTROLES AZUL (abajo) ── */
+  #ctrl-azul {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    width: min(var(--w), 96vw);
+    justify-content: flex-start;
+  }
+
+  /* ── PANEL CONTROL COMPARTIDO ── */
+  .panel-ctrl {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .panel-ctrl .nombre {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+  }
+  .panel-ctrl.azul-ctrl .nombre { color: var(--azul); }
+  .panel-ctrl.rojo-ctrl .nombre { color: var(--rojo); }
+
+  .btns { display: flex; gap: 8px; }
+  .btn {
+    width: 56px; height: 48px;
+    font-size: 18px;
+    background: #0d0d25;
+    border: 2px solid #2a2a5a;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.1s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .btn:active, .btn.presionado { background: #1a1a4a; transform: scale(0.93); }
+  .azul-ctrl .btn:active, .azul-ctrl .btn.presionado { border-color: var(--azul); box-shadow: 0 0 10px var(--azul); }
+  .rojo-ctrl .btn:active, .rojo-ctrl .btn.presionado { border-color: var(--rojo); box-shadow: 0 0 10px var(--rojo); }
+
+  /* teclas info */
+  #teclado-info {
+    margin-top: 12px;
+    font-size: 8px;
+    color: #444;
+    letter-spacing: 0.15em;
+    text-align: center;
+    line-height: 1.9;
+  }
+
+  /* ── BANNER INSTALAR PWA ── */
+  #banner-instalar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    padding: 10px 16px;
+    border: 1px solid #2a2a5a;
+    border-radius: 8px;
+    background: #0a0a20;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    color: #aaa;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  #banner-instalar:hover { border-color: #fff; color: #fff; }
+  #banner-instalar span { font-size: 18px; }
+
+  /* ── OVERLAY VICTORIA ── */
+  #overlay {
+    display: none;
+    position: absolute; inset: 0;
+    background: rgba(5,5,16,0.88);
+    backdrop-filter: blur(4px);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    z-index: 20;
+  }
+  #overlay.visible { display: flex; }
+  #overlay .win-txt {
+    font-size: clamp(14px, 4vw, 22px);
+    letter-spacing: 0.25em;
+    animation: parpadeo 0.8s step-end infinite;
+  }
+  #overlay .win-txt.azul { color: var(--azul); text-shadow: 0 0 24px var(--azul); }
+  #overlay .win-txt.rojo { color: var(--rojo); text-shadow: 0 0 24px var(--rojo); }
+  #btn-reiniciar {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    padding: 14px 24px;
+    background: transparent;
+    border: 2px solid #fff;
+    color: #fff;
+    cursor: pointer;
+    letter-spacing: 0.2em;
+    border-radius: 4px;
+    transition: background 0.2s;
+    touch-action: manipulation;
+  }
+  #btn-reiniciar:hover { background: #ffffff22; }
+
+  @keyframes parpadeo {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ── FLASH PUNTO ── */
+  .flash-azul { animation: flashA 0.25s ease-out; }
+  .flash-rojo  { animation: flashR 0.25s ease-out; }
+  @keyframes flashA { 0% { box-shadow: inset 0 0 80px var(--azul); } 100% { box-shadow: none; } }
+  @keyframes flashR { 0% { box-shadow: inset 0 0 80px var(--rojo); } 100% { box-shadow: none; } }
+</style>
+</head>
+<body>
+
+<h1>🎮 PONG</h1>
+
+<div id="marcador">
+  <div class="pts-azul">
+    <span class="label">AZUL</span>
+    <span id="ptsAzul">0</span>
+  </div>
+  <span class="sep">:</span>
+  <div class="pts-rojo">
+    <span class="label">ROJO</span>
+    <span id="ptsRojo">0</span>
+  </div>
+</div>
+
+<!-- CONTROLES ROJO — ARRIBA -->
+<div id="ctrl-rojo">
+  <div class="panel-ctrl rojo-ctrl">
+    <span class="nombre">JUGADOR ROJO</span>
+    <div class="btns">
+      <button class="btn" id="btnUpR">▲</button>
+      <button class="btn" id="btnDownR">▼</button>
+    </div>
+  </div>
+</div>
+
+<div id="cancha">
+  <div id="azul" class="paleta"></div>
+  <div id="rojo" class="paleta"></div>
+  <div id="pelota"></div>
+
+  <div id="overlay">
+    <div id="win-txt" class="win-txt">¡GANADOR!</div>
+    <button id="btn-reiniciar">▶ REINICIAR</button>
+  </div>
+</div>
+
+<!-- CONTROLES AZUL — ABAJO -->
+<div id="ctrl-azul">
+  <div class="panel-ctrl azul-ctrl">
+    <div class="btns">
+      <button class="btn" id="btnUpA">▲</button>
+      <button class="btn" id="btnDownA">▼</button>
+    </div>
+    <span class="nombre">JUGADOR AZUL</span>
+  </div>
+</div>
+
+<div id="teclado-info">
+  AZUL: teclas W / S &nbsp;|&nbsp; ROJO: ↑ / ↓
+</div>
+
+<!-- Banner instalar PWA -->
+<div id="banner-instalar">
+  <span>📲</span> INSTALAR JUEGO EN PANTALLA DE INICIO
+</div>
+
+<script>
+// ─────────────────────────────────────────
+//  SERVICE WORKER (PWA)
+// ─────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
+// Botón instalar PWA
+let deferredPrompt = null;
+const bannerInstalar = document.getElementById('banner-instalar');
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  bannerInstalar.style.display = 'flex';
+});
+
+bannerInstalar.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') bannerInstalar.style.display = 'none';
+  deferredPrompt = null;
+});
+
+window.addEventListener('appinstalled', () => {
+  bannerInstalar.style.display = 'none';
+  deferredPrompt = null;
+});
+
+// ─────────────────────────────────────────
+//  CONFIG
+// ─────────────────────────────────────────
+const PUNTOS_VICTORIA = 7;
+const VELOCIDAD_PALETA = 5;
+const PALETA_H = 80;
+const PALETA_W = 12;
+const BOLA_R = 7;
+const VELOCIDAD_BOLA_INICIAL = 5;
+
+// ─────────────────────────────────────────
+//  ESTADO
+// ─────────────────────────────────────────
+let canchaW, canchaH;
+let azulY, rojoY;
+let bX, bY, bVx, bVy;
+let ptsAzul = 0, ptsRojo = 0;
+let jugando = false;
+let keys = { upA:false, downA:false, upR:false, downR:false };
+
+// ─────────────────────────────────────────
+//  ELEMENTOS DOM
+// ─────────────────────────────────────────
+const cancha    = document.getElementById('cancha');
+const elAzul    = document.getElementById('azul');
+const elRojo    = document.getElementById('rojo');
+const elPelota  = document.getElementById('pelota');
+const elPtsAzul = document.getElementById('ptsAzul');
+const elPtsRojo = document.getElementById('ptsRojo');
+const overlay   = document.getElementById('overlay');
+const winTxt    = document.getElementById('win-txt');
+const btnReinicio = document.getElementById('btn-reiniciar');
+
+// ─────────────────────────────────────────
+//  INICIALIZACIÓN
+// ─────────────────────────────────────────
+function init() {
+  canchaW = cancha.clientWidth;
+  canchaH = cancha.clientHeight;
+  azulY = canchaH / 2;
+  rojoY = canchaH / 2;
+  resetBola(1);
+  renderPaletas();
+  jugando = true;
+  overlay.classList.remove('visible');
+}
+
+function resetBola(dirX) {
+  bX = canchaW / 2;
+  bY = canchaH / 2;
+  const angulo = (Math.random() * 40 - 20) * Math.PI / 180;
+  bVx = dirX * VELOCIDAD_BOLA_INICIAL * Math.cos(angulo);
+  bVy = VELOCIDAD_BOLA_INICIAL * Math.sin(angulo);
+}
+
+// ─────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────
+function renderPaletas() {
+  elAzul.style.top = (azulY - PALETA_H / 2) + 'px';
+  elRojo.style.top = (rojoY - PALETA_H / 2) + 'px';
+}
+
+function renderBola() {
+  elPelota.style.left = (bX - BOLA_R) + 'px';
+  elPelota.style.top  = (bY - BOLA_R) + 'px';
+}
+
+// ─────────────────────────────────────────
+//  LÓGICA
+// ─────────────────────────────────────────
+function moverPaletas() {
+  const limite = PALETA_H / 2;
+  if (keys.upA)   azulY -= VELOCIDAD_PALETA;
+  if (keys.downA) azulY += VELOCIDAD_PALETA;
+  if (keys.upR)   rojoY -= VELOCIDAD_PALETA;
+  if (keys.downR) rojoY += VELOCIDAD_PALETA;
+  azulY = Math.max(limite, Math.min(canchaH - limite, azulY));
+  rojoY = Math.max(limite, Math.min(canchaH - limite, rojoY));
+}
+
+function moverBola() {
+  bX += bVx;
+  bY += bVy;
+
+  if (bY - BOLA_R <= 0) { bY = BOLA_R; bVy = Math.abs(bVy); }
+  if (bY + BOLA_R >= canchaH) { bY = canchaH - BOLA_R; bVy = -Math.abs(bVy); }
+
+  const azulLeft = 16, azulRight = 16 + PALETA_W;
+  if (bVx < 0 && bX - BOLA_R <= azulRight && bX - BOLA_R >= azulLeft - 4
+      && bY >= azulY - PALETA_H / 2 && bY <= azulY + PALETA_H / 2) {
+    bX = azulRight + BOLA_R;
+    rebotePaleta(azulY);
+  }
+
+  const rojoRight = canchaW - 16, rojoLeft = rojoRight - PALETA_W;
+  if (bVx > 0 && bX + BOLA_R >= rojoLeft && bX + BOLA_R <= rojoRight + 4
+      && bY >= rojoY - PALETA_H / 2 && bY <= rojoY + PALETA_H / 2) {
+    bX = rojoLeft - BOLA_R;
+    rebotePaleta(rojoY);
+  }
+
+  if (bX - BOLA_R <= 0) { marcarPunto('rojo'); return; }
+  if (bX + BOLA_R >= canchaW) { marcarPunto('azul'); return; }
+}
+
+function rebotePaleta(palY) {
+  const rel = (bY - palY) / (PALETA_H / 2);
+  const angulo = rel * 55 * Math.PI / 180;
+  const speed = Math.min(Math.sqrt(bVx*bVx + bVy*bVy) + 0.3, 14);
+  const dir = bVx > 0 ? -1 : 1;
+  bVx = dir * speed * Math.cos(angulo);
+  bVy = speed * Math.sin(angulo);
+}
+
+function marcarPunto(ganador) {
+  jugando = false;
+  if (ganador === 'azul') {
+    ptsAzul++;
+    elPtsAzul.textContent = ptsAzul;
+    flash('azul');
+  } else {
+    ptsRojo++;
+    elPtsRojo.textContent = ptsRojo;
+    flash('rojo');
+  }
+  if (ptsAzul >= PUNTOS_VICTORIA) { mostrarVictoria('AZUL'); return; }
+  if (ptsRojo >= PUNTOS_VICTORIA) { mostrarVictoria('ROJO'); return; }
+  setTimeout(() => {
+    resetBola(ganador === 'azul' ? -1 : 1);
+    jugando = true;
+  }, 700);
+}
+
+function flash(color) {
+  cancha.classList.remove('flash-azul', 'flash-rojo');
+  void cancha.offsetWidth;
+  cancha.classList.add('flash-' + color);
+}
+
+function mostrarVictoria(nombre) {
+  winTxt.textContent = `¡${nombre} GANA!`;
+  winTxt.className = 'win-txt ' + nombre.toLowerCase();
+  overlay.classList.add('visible');
+}
+
+// ─────────────────────────────────────────
+//  GAME LOOP
+// ─────────────────────────────────────────
+function loop() {
+  if (jugando) {
+    moverPaletas();
+    moverBola();
+    renderPaletas();
+    renderBola();
+  }
+  requestAnimationFrame(loop);
+}
+
+// ─────────────────────────────────────────
+//  TECLADO
+// ─────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'w' || e.key === 'W') keys.upA = true;
+  if (e.key === 's' || e.key === 'S') keys.downA = true;
+  if (e.key === 'ArrowUp')   { keys.upR = true; e.preventDefault(); }
+  if (e.key === 'ArrowDown') { keys.downR = true; e.preventDefault(); }
+});
+document.addEventListener('keyup', e => {
+  if (e.key === 'w' || e.key === 'W') keys.upA = false;
+  if (e.key === 's' || e.key === 'S') keys.downA = false;
+  if (e.key === 'ArrowUp')   keys.upR = false;
+  if (e.key === 'ArrowDown') keys.downR = false;
+});
+
+// ─────────────────────────────────────────
+//  BOTONES TÁCTILES
+// ─────────────────────────────────────────
+function bindBtn(id, key) {
+  const el = document.getElementById(id);
+  const setKey = (v) => { keys[key] = v; v ? el.classList.add('presionado') : el.classList.remove('presionado'); };
+  el.addEventListener('mousedown',  () => setKey(true));
+  el.addEventListener('mouseup',    () => setKey(false));
+  el.addEventListener('mouseleave', () => setKey(false));
+  el.addEventListener('touchstart', e => { e.preventDefault(); setKey(true); }, { passive:false });
+  el.addEventListener('touchend',   e => { e.preventDefault(); setKey(false); }, { passive:false });
+}
+
+bindBtn('btnUpA',   'upA');
+bindBtn('btnDownA', 'downA');
+bindBtn('btnUpR',   'upR');
+bindBtn('btnDownR', 'downR');
+
+// ─────────────────────────────────────────
+//  REINICIAR
+// ─────────────────────────────────────────
+btnReinicio.addEventListener('click', () => {
+  ptsAzul = 0; ptsRojo = 0;
+  elPtsAzul.textContent = '0';
+  elPtsRojo.textContent = '0';
+  init();
+});
+
+// ─────────────────────────────────────────
+//  ARRANQUE
+// ─────────────────────────────────────────
+window.addEventListener('load', () => { init(); loop(); });
+window.addEventListener('resize', () => { canchaW = cancha.clientWidth; canchaH = cancha.clientHeight; });
+</script>
+</body>
+  </html>
+  
